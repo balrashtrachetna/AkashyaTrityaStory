@@ -110,37 +110,20 @@
 /* Confetti pieces */
 .confetti {
   position: fixed;
-  width: 8px;
-  height: 8px;
-  background: red;
-  top: -10px;
-  opacity: 0.8;
+  width: 12px;
+  height: 12px;
+  top: -20px;
+  opacity: 0.9;
+  z-index: 9999;
   animation: fall linear forwards;
-  z-index: 999;
 }
 
 @keyframes fall {
-  to {
-    transform: translateY(100vh) rotate(360deg);
-  }
-}
-
-/* Floating stars */
-.star {
-  position: fixed;
-  font-size: 18px;
-  animation: floatUp 2s ease-out forwards;
-  z-index: 999;
-}
-
-@keyframes floatUp {
   0% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0) rotate(0deg);
   }
   100% {
-    opacity: 0;
-    transform: translateY(-120px) scale(1.5);
+    transform: translateY(100vh) translateX(50px) rotate(720deg);
   }
 }
 </style>
@@ -346,10 +329,18 @@ function nextQuestion() {
     loadQuestion();
   } else {
     document.getElementById("quizContent").innerHTML = `
-      <h2>🌟 Well Done!</h2>
+      <h2>🎉 WOW! Amazing Job! 🌟</h2>
       <p>You listened to the story beautifully.</p>     
-      <p><strong>HAPPY AKSHYATRITIYA</strong></p>
+      <p><strong>HAPPY AKSHAYA TRITIYA 💛</strong></p>
+      <br>
+      <button onclick="location.reload()" class="start-btn">Play Again 🔄</button>
     `;
+
+    // 👉 THIS WAS MISSING
+  setTimeout(() => {
+  launchConfetti();
+  launchStars();
+}, 200);
   }
 }
 
@@ -362,7 +353,7 @@ function launchConfetti() {
     const confetti = document.createElement("div");
     confetti.className = "confetti";
     confetti.style.left = Math.random() * window.innerWidth + "px";
-    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+   confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
     confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
 
     document.body.appendChild(confetti);
