@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Whisper Quiz</title>
+
+<style>
+  body {
+    background: linear-gradient(#fff7ec, #fff);
+    font-family: "Segoe UI", Arial, sans-serif;
+    text-align: center;
+    margin: 0;
+    padding: 20px;
+    color: #4b2e1e;
+  }
+
+  .quiz-box {
+    max-width: 560px;
+    margin: auto;
+    background: white;
+    border-radius: 22px;
+    padding: 25px 20px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.12);
+  }
+
+  h2 {
+    font-size: 22px;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: #7a5a3a;
+    margin-bottom: 20px;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  button.option {
+    font-size: 18px;
+    padding: 15px;
+    border-radius: 18px;
+    border: none;
+    background: #ffefd5;
+    cursor: pointer;
+    transition: transform 0.3s, background 0.3s;
+  }
+
+  button.option:hover {
+    transform: scale(1.05);
+    background: #ffe3b3;
+  }
+
+  .spin {
+    animation: spin 0.6s;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .wrong {
+    animation: shake 0.5s;
+    background: #fff2b3; /* soft yellow */
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+  }
+
+  #feedback {
+    margin-top: 18px;
+    font-size: 17px;
+    color: #2f7a2f;
+    min-height: 24px;
+  }
+
+  .next-btn {
+    margin-top: 22px;
+    padding: 12px 26px;
+    font-size: 16px;
+    border-radius: 14px;
+    border: none;
+    background: #5c8d89;
+    color: white;
+    cursor: pointer;
+    display: none;
+  }
+  
+  .start-btn {
+  margin-top: 20px;
+  padding: 12px 26px;
+  font-size: 16px;
+  border-radius: 14px;
+  border: none;
+  background: #5c8d89;
+  color: white;
+  cursor: pointer;
+  display: inline-block; /* visible */
+}
+/* Confetti pieces */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  background: red;
+  top: -10px;
+  opacity: 0.8;
+  animation: fall linear forwards;
+  z-index: 999;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh) rotate(360deg);
+  }
+}
+
+/* Floating stars */
+.star {
+  position: fixed;
+  font-size: 18px;
+  animation: floatUp 2s ease-out forwards;
+  z-index: 999;
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-120px) scale(1.5);
+  }
+}
+</style>
+</head>
+
+<body>
+<div id="welcomeScreen" class="quiz-box">
+  <h2>🌟 Welcome to the Secret Whisper Quiz! 🌟</h2>
+  <p>Hi there! Let's have some fun and learn with Riya's story.</p>
+  <button id="startBtn" class="start-btn" onclick="startQuiz()">Start Quiz 💛</button>
+</div>
+
+<div id="quizContent" class="quiz-box" style="display:none;">
+  <h2 id="question"></h2>
+  <div class="subtitle" id="subtitle"></div>
+  <div class="options" id="options"></div>
+  <div id="feedback"></div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Next 🌸</button>
+</div>
+<script>
+function startQuiz() {
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("quizContent").style.display = "block";
+  loadQuestion();
+}
+
+const quiz = [
+  {
+  q: "What does the word 'Akshaya' mean?",
+  sub: "Think about something that never ends ✨",
+  options: ["Temporary", "Never-ending", "Expensive"],
+  correct: "Never-ending",
+  feedback: (answer) => {
+    if (answer === "Never-ending") return "Correct! Akshaya means something that never ends 💛";
+    if (answer === "Temporary") return "Good try! Temporary means something that does not last long 🙂";
+    if (answer === "Expensive") return "Nice guess! But Akshaya is about endless goodness, not cost 🌿";
+    return "";
+  }
+},
+{
+  q: "Who received the Akshaya Patra?",
+  sub: "He was the eldest Pandava 🤔",
+  options: ["Arjuna", "Bhima", "Yudhishthira"],
+  correct: "Yudhishthira",
+  feedback: (answer) => {
+    if (answer === "Yudhishthira") return "Yes! Yudhishthira received the Akshaya Patra 🌟";
+    if (answer === "Arjuna") return "Nice try! Arjuna was a great warrior 🏹";
+    if (answer === "Bhima") return "Good thinking! Bhima was very strong 💪";
+    return "";
+  }
+},
+{
+  q: "Which god gave the Akshaya Patra?",
+  sub: "He gives light and energy to all 🌞",
+  options: ["Indra", "Surya", "Agni"],
+  correct: "Surya",
+  feedback: (answer) => {
+    if (answer === "Surya") return "Correct! Surya Dev gave the magical bowl 🌞";
+    if (answer === "Indra") return "Nice try! Indra is the king of gods ⚡";
+    if (answer === "Agni") return "Good guess! Agni is the god of fire 🔥";
+    return "";
+  }
+},
+{
+  q: "When would the Akshaya Patra stop giving food?",
+  sub: "Think about Draupadi’s role 🍲",
+  options: ["After sunset", "After Draupadi ate", "After guests left"],
+  correct: "After Draupadi ate",
+  feedback: (answer) => {
+    if (answer === "After Draupadi ate") return "Yes! It worked until Draupadi finished eating 💛";
+    if (answer === "After sunset") return "Good try! Time didn’t matter here 🙂";
+    if (answer === "After guests left") return "Nice thinking! But it depended on Draupadi 🌿";
+    return "";
+  }
+},
+{
+  q: "Why did Draupadi feel worried?",
+  sub: "Think about her responsibility 🤔",
+  options: ["No place to stay", "Not enough food", "Lost her jewelry"],
+  correct: "Not enough food",
+  feedback: (answer) => {
+    if (answer === "Not enough food") return "Correct! She was worried about feeding everyone 💛";
+    if (answer === "No place to stay") return "Good try! They were living in the forest 🌳";
+    if (answer === "Lost her jewelry") return "Nice guess! But her worry was about food 🍲";
+    return "";
+  }
+},
+{
+  q: "Who helped Draupadi when the bowl was empty?",
+  sub: "He is known for helping his devotees 💛",
+  options: ["Krishna", "Shiva", "Brahma"],
+  correct: "Krishna",
+  feedback: (answer) => {
+    if (answer === "Krishna") return "Yes! Krishna came to help Draupadi 💛";
+    if (answer === "Shiva") return "Nice try! Shiva is the destroyer and protector 🌿";
+    if (answer === "Brahma") return "Good thinking! Brahma is the creator 🌟";
+    return "";
+  }
+},
+{
+  q: "What did Krishna find in the bowl?",
+  sub: "It was very tiny 🍃",
+  options: ["A lot of food", "One small piece", "Nothing at all"],
+  correct: "One small piece",
+  feedback: (answer) => {
+    if (answer === "One small piece") return "Correct! Even one small piece was enough ✨";
+    if (answer === "A lot of food") return "Good try! The bowl looked empty 🙂";
+    if (answer === "Nothing at all") return "Almost! There was one tiny piece left 🍃";
+    return "";
+  }
+},
+{
+  q: "What happened after Krishna ate that small piece?",
+  sub: "Think about the guests 😲",
+  options: ["They became hungry", "They felt full", "They got angry"],
+  correct: "They felt full",
+  feedback: (answer) => {
+    if (answer === "They felt full") return "Yes! Everyone felt full without eating 🌟";
+    if (answer === "They became hungry") return "Good try! It was the opposite 🙂";
+    if (answer === "They got angry") return "Nice guess! But they quietly left 🌿";
+    return "";
+  }
+},
+{
+  q: "What value does this story teach us?",
+  sub: "Think about how we treat guests 💛",
+  options: ["Be selfish", "Respect guests", "Avoid sharing"],
+  correct: "Respect guests",
+  feedback: (answer) => {
+    if (answer === "Respect guests") return "Beautiful! We should welcome guests with love 💛";
+    if (answer === "Be selfish") return "Good try! The story teaches the opposite 🙂";
+    if (answer === "Avoid sharing") return "Nice thinking! But sharing is important 🌿";
+    return "";
+  }
+}
+];
+let current = 0;
+
+function loadQuestion() {
+  document.getElementById("question").innerText = quiz[current].q;
+  document.getElementById("subtitle").innerText = quiz[current].sub;
+
+  const optionsDiv = document.getElementById("options");
+  optionsDiv.innerHTML = "";
+
+  quiz[current].options.forEach(opt => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.innerText = opt;
+    btn.onclick = () => selectOption(btn);
+    optionsDiv.appendChild(btn);
+  });
+
+  document.getElementById("feedback").innerText = "";
+  document.getElementById("nextBtn").style.display = "none";
+}
+
+function selectOption(button) {
+  document.querySelectorAll(".option").forEach(b => b.classList.remove("spin", "wrong"));
+
+  const answer = button.innerText;
+  const question = quiz[current];
+  const feedbackMsg = question.feedback(answer);
+
+  document.getElementById("feedback").innerText = feedbackMsg;
+
+  let isWrong = false;
+
+  if (question.correct) {
+    if (Array.isArray(question.correct)) {
+      if (!question.correct.includes(answer)) isWrong = true;
+    } else if (answer !== question.correct) {
+      isWrong = true;
+    }
+  }
+
+  if (isWrong) {
+    // Wrong answers shake
+    button.classList.add("wrong");
+    setTimeout(() => button.classList.remove("wrong"), 600);
+    // Next button stays hidden
+    document.getElementById("nextBtn").style.display = "none";
+  } else {
+    // Correct answers spin
+    button.classList.add("spin");
+    // Enable Next button
+   if (current === quiz.length - 1) {
+  // Last question → auto finish after 1 second
+  setTimeout(() => {
+    nextQuestion();
+  }, 1000);
+} else {
+  document.getElementById("nextBtn").style.display = "inline-block";
+}
+  }
+}
+
+
+
+function nextQuestion() {
+  current++;
+  if (current < quiz.length) {
+    loadQuestion();
+  } else {
+    document.getElementById("quizContent").innerHTML = `
+      <h2>🌟 Well Done!</h2>
+      <p>You listened to the story beautifully.</p>     
+      <p><strong>HAPPY AKSHYATRITIYA</strong></p>
+    `;
+  }
+}
+
+loadQuestion();
+
+function launchConfetti() {
+  const colors = ["#ff6b6b", "#ffd93d", "#6bcB77", "#4d96ff", "#ff9f1c"];
+
+  for (let i = 0; i < 60; i++) {
+    const confetti = document.createElement("div");
+    confetti.className = "confetti";
+    confetti.style.left = Math.random() * window.innerWidth + "px";
+    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+    confetti.style.animationDuration = (Math.random() * 2 + 2) + "s";
+
+    document.body.appendChild(confetti);
+
+    setTimeout(() => confetti.remove(), 4000);
+  }
+}
+
+function launchStars() {
+  for (let i = 0; i < 20; i++) {
+    const star = document.createElement("div");
+    star.className = "star";
+    star.innerText = "✨";
+    star.style.left = Math.random() * window.innerWidth + "px";
+    star.style.top = Math.random() * window.innerHeight + "px";
+
+    document.body.appendChild(star);
+
+    setTimeout(() => star.remove(), 2000);
+  }
+}
+</script>
+
+</body>
+</html>
